@@ -1,68 +1,82 @@
 #include <stdio.h>
-#define MAX_QUEUE_SIZE 5
+#include <stdlib.h>
+#include <string.h>
+#define MAX_STACK_SIZE 10
 
-typedef int element;
-typedef struct 
-{
-    element data[MAX_QUEUE_SIZE];
-    int front, rear;
+typedef char element;
+typedef struct {
+    element data[MAX_STACK_SIZE];
+    int top;
+} StackType;
 
-}QueueType;
-
-void init_queue(QueueType* q) {
-    q->rear = 0;
-    q->front = 0;
+void init_stack(StackType *s) {
+    s->top = -1;
 }
 
-int is_full(QueueType* q) {
-    return (q->rear + 1) % MAX_QUEUE_SIZE == q->front;
+int is_full(StackType *s) {
+    return (s->top == MAX_STACK_SIZE - 1);
 }
 
-void enqueue(QueueType* q, element num){
-    //OverFlow check!!
-    if(is_full(q)){
-        printf("큐가 포화상태입니다\n");
+void push(StackType *s, element item) {
+    if (is_full(s)) {
+        printf("스택 포화 에러(overflow error)");
+        return;
+    } else {
+        s->data[++(s->top)] = item;
     }
-    q->rear = (q-> rear + 1) % MAX_QUEUE_SIZE;
-    q->data[q->rear] = num;
 }
 
-int is_empty(QueueType* q) {
-    return q->front == q->rear;
+int is_empty(StackType *s) {
+    return (s->top == -1);
 }
 
-void print_queue(QueueType* q) {
-    printf("QUEUE(front=%d, rear=%d) : " , q->front, q->rear);
-    if(!is_empty(q)) {
-        int i = q->front;
-        do {
-            i = (i+1) % MAX_QUEUE_SIZE;
-            printf("[%d]", q->data[i]);
-            if(i == q->rear)
-            break;
-        }while(i != q->front);
+element pop(StackType *s) {
+    if (is_empty(s)) {
+        printf("스택 공백 에러(underflow error)");
+        exit(1); //stdlib.h
+    } else {
+        return s->data[(s->top)--];
     }
-    printf("\n");
 }
 
-element dequeue(QueueType* q){
-    if(is_empty(q)) {
-        printf("큐가 공백상태입니다.");
+//후위 표기 수식의 계산을 위한 함수
+int eval(const char exp[]) {
+    int op1, op2, value, i = 0;
+    int len = strlen(exp);
+    char ch;
+
+    StackType s;
+    init_stack(&s);
+
+    for (i = 0; i < len; i++) {
+        ch = exp[i];
+        if (ch != '+' && ch != '-' && ch != '*' && ch != '/') {
+            value = ch - '0';
+            push(&s, value);
+        } else {
+            op2 = pop(&s);
+            op1 = pop(&s);
+            switch (ch) {
+                case '+':
+                    push(&s, op1 + op2);
+                    break;
+                case '-':
+                    push(&s, op1 - op2);
+                    break;
+                case '*':
+                    push(&s, op1 * op2);
+                    break;
+                case '/':
+                    push(&s, op1 / op2);
+                    break;
+            }
+        }
     }
-    q->front = (q->front + 1) % MAX_QUEUE_SIZE;
-    return q->data[q->front];
+    return pop(&s);
 }
 
 int main() {
-    QueueType queue;
-    init_queue(&queue);
-    enqueue(&queue, 10);
-    enqueue(&queue, 20);
-    enqueue(&queue, 30);
-
-    print_queue(&queue);
-
-    element temp = dequeue(&queue);
-    printf("꺼내진 정수 : %d\n", temp);
-    print_queue(&queue);
+    int result;
+    result = eval("82/3-32*+");
+    printf("결과값: %d\n", result);
 }
