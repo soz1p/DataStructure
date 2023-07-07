@@ -142,6 +142,7 @@ Temporary Items
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,macos,visualstudiocode,git,c
-LectureContent/output/dataStructureDay12-2
 output
 *.dSYM
+LectureContent/output/*
+HomeWork/output/*
