@@ -41,6 +41,7 @@ void insert_last(ListType *plist, int coef, int expon)
         plist->tail->link = temp;
         plist->tail = temp;
     }
+    plist->size++;
 }
 
 void poly_add(ListType *plist1, ListType *plist2, ListType *plist3)
